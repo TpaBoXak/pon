@@ -152,3 +152,4 @@ if __name__ == '__main__':
     print(DEG_P_N(a))
     print(MUL_Pxk_P(a, k))
     print(DER_P_P(a))
+    print(a)
