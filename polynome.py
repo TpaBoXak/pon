@@ -1,4 +1,4 @@
-from rational import Rational
+from rational import *
 
 
 class Polynome:
@@ -68,7 +68,7 @@ class Polynome:
 
         for i in range(self.m, -1, -1):
             j = self.m - i  # Номер коэффициента
-            koeff = self.C[j]   # Вид коэффициента при выводе
+            koeff = self.C[j]  # Вид коэффициента при выводе
 
             if koeff.numer.A == [1] and koeff.denom.A == [1] and i != 0:
                 koeff = '-' if koeff.numer.b else ''
@@ -93,26 +93,26 @@ def DEG_P_N(polynome):
     return polynome.m
 
 
-def MUL_Pxk_P(a, k):
+def MUL_Pxk_P(poly1, k):
     """Умножение полинома на x^k. Угрюмов Михаил."""
-    a.m = a.m + k
+    poly1.m = poly1.m + k
     for i in range(k):
-        a.C.append(Rational("0/1"))
-    return a
+        poly1.C.append(Rational("0/1"))
+    return poly1
 
 
-def DER_P_P(a):
+def DER_P_P(poly1):
     """Производная многочлена. Николаев Клим."""
-    if a.m == 0:
-        a.C[0] = 0
-    else:
-        a.m = a.m - 1
-        a.C.pop(len(a.C) - 1)
-        t = a.m
-        for i in range(len(a.C)):
-            a.C[i] = a.C[i] * Rational(str(t))
+    if poly1.m == 0:
+        poly1.C[0] = 0
+    elif poly1.m > 0:
+        poly1.m = poly1.m - 1
+        poly1.C.pop(len(poly1.C) - 1)
+        t = poly1.m + 1
+        for i in range(len(poly1.C)):
+            poly1.C[i] = MUL_QQ_Q(poly1.C[i], Rational(str(t)))
             t -= 1
-    return a
+    return poly1
 
 
 def ADD_PP_P(poly1, poly2):
@@ -199,13 +199,46 @@ def MOD_PP_P(poly1, divider):
     return res_poly
 
 
+def FAC_P_Q(a):
+    """Вынесение из многочлена НОК знаменателей коэффициентов и НОД числителей.Максимов Матвей"""
+    a = [ABS_Z_N(i.numer) for i in a.C if str(i.numer) != '0']
+    if len(a) < 2:
+        return a[0]
+    elif len(a) == 2:
+        return (GCF_NN_N(a[0], a[1]))
+    nod = GCF_NN_N(a[0], a[1])
+    for i in range(3, len(a)):
+        nod = GCF_NN_N(nod, a[i])
+    b = [ABS_Z_N(j.denom) for j in b.C if str(j.denom) != '0']
+    if len(b) < 2:
+        return b[0]
+    elif len(b) == 2:
+        return (LCM_NN_N(b[0], b[1]))
+    nok = LCM_NN_N(b[0], b[1])
+    for j in range(3, len(a)):
+        nok = LCM_NN_N(nok, b[i])
+    q = Rational(str(Rational(str(nod))) + '/' + str(Natural(str(nok))))
+    return q
+
+
+def NMR_P_P(poly1):
+    """Преобразование многочлена — кратные корни в простые.Николаев Клим"""
+    # Заглушка в ожидании функций
+    # Производная многочлена
+    temp = DER_P_P(poly1)
+    # НОД многочлена и его производной
+    gcf = GCF_PP_P(poly1, temp)
+    fac = FAC_P_Q(gcf)
+    # Делим многочлен на значеие НОД и возвращаем результат
+    res = DIV_PP_P(poly1, gcf)
+    res = MUL_PQ_P(res, fac)
+    return Polynome(res)
+
+
 if __name__ == '__main__':
-    a = Polynome("-4/3x^4 + 7/5x^3-13/2x-5/4")
+    a = Polynome("-9/3x^4 + 15/5x^3-12/2x-8/4")
     b = Polynome("3/2 -13/7 -5/2")
-    k = int(input())
+    # k = int(input())
     print(a)
-    print(LED_P_Q(a))
-    print(DEG_P_N(a))
-    print(MUL_Pxk_P(a, k))
     print(DER_P_P(a))
     print(a)
